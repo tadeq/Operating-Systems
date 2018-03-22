@@ -1,0 +1,127 @@
+Copying 10000 records (4 bytes each) with sys functions took:
+User time: 0 seconds 3416 microseconds
+System time: 0 seconds 16782 microseconds
+
+Copying 10000 records (4 bytes each) with lib functions took:
+User time: 0 seconds 323 microseconds
+System time: 0 seconds 0 microseconds
+
+Sorting 10000 records (4 bytes each) with sys functions took:
+User time: 12 seconds 807997 microseconds
+System time: 55 seconds 1237597 microseconds
+
+Sorting 10000 records (4 bytes each) with lib functions took:
+User time: 26 seconds 150406 microseconds
+System time: 76 seconds 724242 microseconds
+
+Copying 5000 records (4 bytes each) with sys functions took:
+User time: 0 seconds 0 microseconds
+System time: 0 seconds 8610 microseconds
+
+Copying 5000 records (4 bytes each) with lib functions took:
+User time: 0 seconds 141 microseconds
+System time: 0 seconds 0 microseconds
+
+Sorting 5000 records (4 bytes each) with sys functions took:
+User time: 3 seconds 52992 microseconds
+System time: 14 seconds 601979 microseconds
+
+Sorting 5000 records (4 bytes each) with lib functions took:
+User time: 5 seconds 363330 microseconds
+System time: 20 seconds 630852 microseconds
+
+Copying 5000 records (512 bytes each) with sys functions took:
+User time: 0 seconds 0 microseconds
+System time: 0 seconds 10353 microseconds
+
+Copying 5000 records (512 bytes each) with lib functions took:
+User time: 0 seconds 0 microseconds
+System time: 0 seconds 2213 microseconds
+
+Sorting 5000 records (512 bytes each) with sys functions took:
+User time: 3 seconds 243041 microseconds
+System time: 14 seconds 1088985 microseconds
+
+Sorting 5000 records (512 bytes each) with lib functions took:
+User time: 5 seconds 899156 microseconds
+System time: 18 seconds 1866158 microseconds
+
+Copying 3000 records (512 bytes each) with sys functions took:
+User time: 0 seconds 0 microseconds
+System time: 0 seconds 5637 microseconds
+
+Copying 3000 records (512 bytes each) with lib functions took:
+User time: 0 seconds 1279 microseconds
+System time: 0 seconds 0 microseconds
+
+Sorting 3000 records (512 bytes each) with sys functions took:
+User time: 1 seconds 251360 microseconds
+System time: 5 seconds 419067 microseconds
+
+Sorting 3000 records (512 bytes each) with lib functions took:
+User time: 2 seconds 233880 microseconds
+System time: 6 seconds 761145 microseconds
+
+Copying 3000 records (4096 bytes each) with sys functions took:
+User time: 0 seconds 0 microseconds
+System time: 0 seconds 9404 microseconds
+
+Copying 3000 records (4096 bytes each) with lib functions took:
+User time: 0 seconds 0 microseconds
+System time: 0 seconds 10791 microseconds
+
+Sorting 3000 records (4096 bytes each) with sys functions took:
+User time: 1 seconds 183444 microseconds
+System time: 5 seconds 1170804 microseconds
+
+Sorting 3000 records (4096 bytes each) with lib functions took:
+User time: 1 seconds 600125 microseconds
+System time: 5 seconds 1545896 microseconds
+
+Copying 2000 records (4096 bytes each) with sys functions took:
+User time: 0 seconds 2942 microseconds
+System time: 0 seconds 3289 microseconds
+
+Copying 2000 records (4096 bytes each) with lib functions took:
+User time: 0 seconds 0 microseconds
+System time: 0 seconds 6938 microseconds
+
+Sorting 2000 records (4096 bytes each) with sys functions took:
+User time: 0 seconds 519670 microseconds
+System time: 2 seconds 868198 microseconds
+
+Sorting 2000 records (4096 bytes each) with lib functions took:
+User time: 0 seconds 791722 microseconds
+System time: 2 seconds 792255 microseconds
+
+Copying 3000 records (8192 bytes each) with sys functions took:
+User time: 0 seconds 0 microseconds
+System time: 0 seconds 16344 microseconds
+
+Copying 3000 records (8192 bytes each) with lib functions took:
+User time: 0 seconds 0 microseconds
+System time: 0 seconds 20308 microseconds
+
+Sorting 3000 records (8192 bytes each) with sys functions took:
+User time: 1 seconds 263193 microseconds
+System time: 8 seconds 1025079 microseconds
+
+Sorting 3000 records (8192 bytes each) with lib functions took:
+User time: 1 seconds 543834 microseconds
+System time: 9 seconds 677034 microseconds
+
+Copying 2000 records (8192 bytes each) with sys functions took:
+User time: 0 seconds 4539 microseconds
+System time: 0 seconds 4882 microseconds
+
+Copying 2000 records (8192 bytes each) with lib functions took:
+User time: 0 seconds 0 microseconds
+System time: 0 seconds 12365 microseconds
+
+Sorting 2000 records (8192 bytes each) with sys functions took:
+User time: 0 seconds 619284 microseconds
+System time: 3 seconds 1253283 microseconds
+
+Sorting 2000 records (8192 bytes each) with lib functions took:
+User time: 0 seconds 784218 microseconds
+System time: 3 seconds 1399042 microseconds
