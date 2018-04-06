@@ -14,7 +14,7 @@ void check_if_open(FILE *file);
 
 int find_command(const char **commands, char *com);
 
-void take_measurements(struct timeval *u_start, struct timeval *s_start, struct rusage *usage);
+void take_measurements(struct timeval *user_time, struct timeval *sys_time, struct rusage *usage);
 
 void correct_results(struct timeval *u_start, struct timeval *s_start, struct timeval *u_end, struct timeval *s_end);
 
@@ -130,10 +130,10 @@ int find_command(const char **commands, char *com) {
     return -1;
 }
 
-void take_measurements(struct timeval *u_start, struct timeval *s_start, struct rusage *usage) {
+void take_measurements(struct timeval *user_time, struct timeval *sys_time, struct rusage *usage) {
     getrusage(RUSAGE_SELF, usage);
-    *s_start = usage->ru_stime;
-    *u_start = usage->ru_utime;
+    *sys_time = usage->ru_stime;
+    *user_time = usage->ru_utime;
 }
 
 void correct_results(struct timeval *u_start, struct timeval *s_start, struct timeval *u_end, struct timeval *s_end) {
