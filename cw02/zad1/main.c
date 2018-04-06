@@ -14,9 +14,7 @@ void check_if_open(FILE *file);
 
 int find_command(const char **commands, char *com);
 
-void init_measurements(struct timeval *u_start, struct timeval *s_start, struct rusage *usage);
-
-void end_measurements(struct timeval *u_end, struct timeval *s_end, struct rusage *usage);
+void take_measurements(struct timeval *u_start, struct timeval *s_start, struct rusage *usage);
 
 void correct_results(struct timeval *u_start, struct timeval *s_start, struct timeval *u_end, struct timeval *s_end);
 
@@ -66,9 +64,9 @@ int main(int argc, char **argv) {
                 exit(1);
             }
             check_if_open(file1);
-            init_measurements(&u_start, &s_start, &usage);
+            take_measurements(&u_start, &s_start, &usage);
             sort(file1, atoi(argv[3]), atoi(argv[4]), argv[5]);
-            end_measurements(&u_end, &s_end, &usage);
+            take_measurements(&u_end, &s_end, &usage);
             break;
         case 2:
             if (argc < 7) {
@@ -88,9 +86,9 @@ int main(int argc, char **argv) {
             }
             check_if_open(from);
             check_if_open(to);
-            init_measurements(&u_start, &s_start, &usage);
+            take_measurements(&u_start, &s_start, &usage);
             copy(from, to, atoi(argv[4]), atoi(argv[5]), argv[6]);
-            end_measurements(&u_end, &s_end, &usage);
+            take_measurements(&u_end, &s_end, &usage);
             break;
         default:
             printf("Wrong parameter\n");
@@ -132,16 +130,10 @@ int find_command(const char **commands, char *com) {
     return -1;
 }
 
-void init_measurements(struct timeval *u_start, struct timeval *s_start, struct rusage *usage) {
+void take_measurements(struct timeval *u_start, struct timeval *s_start, struct rusage *usage) {
     getrusage(RUSAGE_SELF, usage);
     *s_start = usage->ru_stime;
     *u_start = usage->ru_utime;
-}
-
-void end_measurements(struct timeval *u_end, struct timeval *s_end, struct rusage *usage) {
-    getrusage(RUSAGE_SELF, usage);
-    *s_end = usage->ru_stime;
-    *u_end = usage->ru_utime;
 }
 
 void correct_results(struct timeval *u_start, struct timeval *s_start, struct timeval *u_end, struct timeval *s_end) {
