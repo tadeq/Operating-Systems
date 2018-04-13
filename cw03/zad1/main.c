@@ -14,7 +14,7 @@ void traverse(DIR *dir, char *path, struct dirent *dirent, int comp, char *date)
 
 int main(int argc, char **argv) {
     if (argc < 4) {
-        printf("Too few arguments");
+        printf("Too few arguments\n");
         exit(1);
     }
     char path[2000] = "";
@@ -24,19 +24,19 @@ int main(int argc, char **argv) {
     else if (strcmp(argv[2], ">") == 0) comp = 1;
     else if (strcmp(argv[2], "=") == 0) comp = 0;
     else {
-        printf("Wrong argument");
+        printf("Wrong argument\n");
         exit(1);
     }
     DIR *dir = opendir(path);
     if (dir == NULL) {
-        printf("No such file or directory");
+        printf("No such file or directory\n");
         exit(1);
     }
     if (argc == 4) {
         struct dirent *dirent;
         traverse(dir, path, dirent, comp, argv[3]);
     } else {
-        printf("Wrong argument");
+        printf("Wrong argument\n");
         exit(1);
     }
 }

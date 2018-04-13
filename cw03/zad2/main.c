@@ -9,12 +9,12 @@
 
 int main(int argc, char **argv) {
     if (argc < 2) {
-        printf("Missing name of file containing batch job");
+        printf("Missing name of file containing batch job\n");
         exit(1);
     }
     FILE *file = fopen(argv[1], "r");
     if (file == NULL) {
-        printf("Can't open file");
+        printf("Can't open file\n");
         exit(1);
     }
     const char *delim = " \t\n";
@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
         } else {
             waitpid(childpid, &status, 0);
             if (status != 0) {
-                printf("Batch job execution failed");
+                printf("Batch job execution failed\n");
             }
         }
     }

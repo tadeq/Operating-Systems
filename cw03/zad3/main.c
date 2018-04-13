@@ -11,7 +11,7 @@
 
 int main(int argc, char **argv) {
     if (argc < 4) {
-        printf("Too few arguments");
+        printf("Too few arguments\n");
         exit(1);
     }
     int time;
@@ -20,12 +20,12 @@ int main(int argc, char **argv) {
     mem = atoi(argv[3]);
     mem = mem * 1048576;
     if (time == 0 || mem == 0) {
-        printf("Wrong parameter");
+        printf("Wrong parameter\n");
         exit(1);
     }
     FILE *file = fopen(argv[1], "r");
     if (file == NULL) {
-        printf("Can't open file");
+        printf("Can't open file\n");
         exit(1);
     }
 
@@ -58,11 +58,11 @@ int main(int argc, char **argv) {
         int status;
         if (childpid == 0) {
             if (setrlimit(RLIMIT_CPU, &time_lim) != 0) {
-                printf("CPU time limit setting failed");
+                printf("CPU time limit setting failed\n");
                 exit(1);
             }
             if (setrlimit(RLIMIT_AS, &mem_lim) != 0) {
-                printf("Virtual memory limit setting failed");
+                printf("Virtual memory limit setting failed\n");
                 exit(1);
             }
             status = execvp(args[0], args);
@@ -70,7 +70,7 @@ int main(int argc, char **argv) {
         } else {
             waitpid(childpid, &status, 0);
             if (status != 0) {
-                printf("Batch job execution failed");
+                printf("Batch job execution failed\n");
             }
         }
         getrusage(RUSAGE_CHILDREN, &usage);
