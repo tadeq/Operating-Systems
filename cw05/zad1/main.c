@@ -7,8 +7,7 @@
 
 #define MAX_LINE_LEN 500
 #define MAX_ARGS_NO 50
-#define MAX_PIPES 10
-
+#define MAX_PIPES 5
 
 int main(int argc, char **argv) {
     if (argc < 2) {
@@ -24,12 +23,12 @@ int main(int argc, char **argv) {
     const char *delim = " \t\n";
     char buf[MAX_LINE_LEN];
     char *args[MAX_ARGS_NO];
-    char *commands[MAX_PIPES - 1];
+    char *commands[MAX_PIPES+1];
     while (fgets(buf, MAX_LINE_LEN, file) != NULL) {
         int commands_counter = 1;
         delim = "|\n";
         commands[0] = (strtok(buf, delim));
-        while ((commands[commands_counter] = strtok(NULL, delim)) != NULL && commands_counter < MAX_ARGS_NO) {
+        while ((commands[commands_counter] = strtok(NULL, delim)) != NULL && commands_counter <= MAX_PIPES) {
             commands_counter++;
         }
         commands[commands_counter] = NULL;
