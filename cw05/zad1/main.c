@@ -69,29 +69,3 @@ int main(int argc, char **argv) {
     }
     fclose(file);
 }
-
-
-/*
-
-int main(int argc, char **argv){
-
-    int task1[MAX_ARGS_NO];
-    int task2[MAX_ARGS_NO];
-
-    const char* delim=" \t\n";
-    task1[0]=strtok(argv[1],delim);
-    task2[0]=strtok(argv[2],delim);
-    int i=1;
-    while ((task1[i]=strtok(NULL,delim))!=NULL && i<MAX_ARGS_NO){
-        i++;
-    }
-    i=1;
-    while ((task2[i]=strtok(NULL,delim))!=NULL && i<MAX_ARGS_NO){
-        i++;
-    }
-    FILE* next_in = popen(argv[1], "w");
-
-    pclose(next_in);
-}
-
-*/
