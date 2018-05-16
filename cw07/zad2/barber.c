@@ -35,13 +35,14 @@ void remove_shm_and_semaphores();
 void print_message(const char *);
 
 int main(int argc, char **argv) {
-    if (atexit(remove_shm_and_semaphores) < 0)
-        FAILURE_EXIT(1, "Barber: Can't register atexit function\n");
     if (argc != 2)
         FAILURE_EXIT(1, "Barber: Wrong number of arguments (pass only capacity of the waiting room)\n");
     int capacity = strtol(argv[1], NULL, 10);
     if (capacity>MAX_CLIENTS)
         FAILURE_EXIT(1, "Barber: Given capacity is too big. Maximum waiting room capacity is %d",MAX_CLIENTS);
+    if (atexit(remove_shm_and_semaphores) < 0)
+        FAILURE_EXIT(1, "Barber: Can't register atexit function\n");
+
     signal(SIGTERM, handle_signal);
     signal(SIGINT, handle_signal);
     init_semaphores();
@@ -55,6 +56,7 @@ int main(int argc, char **argv) {
     for (int i = 0; i < capacity; i++) {
         barbershop->client_pids[i] = 0;
     }
+
     char msg[256];
     while (1) {
         sem_wait(sem_asleep);

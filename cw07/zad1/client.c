@@ -1,14 +1,11 @@
 #include <stdio.h>
-#include <signal.h>
 #include <stdlib.h>
-#include <time.h>
-#include <semaphore.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
 #include <unistd.h>
 #include <wait.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <sys/sem.h>
+#include <time.h>
 
 #include "common.h"
 
@@ -17,25 +14,9 @@ int first_for_shaving = 0;
 struct barbershop *barbershop;
 int shm = -1;
 
-sem_t *sem_waiting_room;
-sem_t *sem_asleep;
-sem_t *sem_wake_up;
-sem_t *sem_sit;
-sem_t *sem_shave;
-sem_t *sem_end_shaving;
-sem_t *sem_leave;
-
 void handle_exit(int);
 
 void handle_invitation(int);
-
-sem_t *open_semaphore(sem_t *, const char *);
-
-void init_semaphores();
-
-int semaphore_close(sem_t *, const char *);
-
-void remove_semaphores();
 
 void print_message(const char *);
 
@@ -49,35 +30,49 @@ int main(int argc, char **argv) {
     if (no_of_shaves > MAX_SHAVES)
         FAILURE_EXIT(1, "Client: Number of shaves too big. One client can be shaved only %d times\n", MAX_SHAVES);
 
-    if (atexit(remove_semaphores) < 0)
-        FAILURE_EXIT(1, "Client: Can't register atexit function\n");
     signal(SIGTERM, handle_exit);
     signal(SIGINT, handle_exit);
     signal(SIGUSR1, handle_invitation);
-    init_semaphores();
-    int shm = -1;
-    if ((shm = shm_open(shm_path, 0666, DEFFILEMODE)) < 0) FAILURE_EXIT(1, "Client: Can't open shared memory\n");
-    if ((barbershop = (struct barbershop *) mmap(NULL, sizeof(struct barbershop), PROT_READ | PROT_WRITE, MAP_SHARED, shm, 0)) < 0)
+    key_t sem_key = ftok(sem_path, PROJECT_ID);
+    int sem;
+    if ((sem = semget(sem_key, 0, 0666)) < 0)
+        FAILURE_EXIT(1, "Client: Can't get semaphores\n");
+    key_t shm_key = ftok(shm_path, PROJECT_ID);
+    int shm;
+    if ((shm = shmget(shm_key, sizeof(struct barbershop), 0666)) < 0)
+        FAILURE_EXIT(1, "Client: Can't open shared memory\n");
+    if ((barbershop = (struct barbershop *) shmat(shm, NULL, 0)) < 0)
         FAILURE_EXIT(1, "Client: Can't get shared memory address\n");
 
+    struct sembuf wait;
+    wait.sem_op = -1;
+    wait.sem_flg = 0;
+    struct sembuf post;
+    post.sem_op = 1;
+    post.sem_flg = 0;
     pid_t clients[MAX_CLIENTS];
     int clients_counter = 0;
     for (int i = 0; i < no_of_clients; i++) {
-        pid_t client_pid = fork();
-        if (client_pid == 0) {
+        pid_t child = fork();
+        if (child == 0) {
             char msg[256];
             for (int j = 0; j < no_of_shaves; j++) {
-                sem_wait(sem_asleep);
+                wait.sem_num = SEM_ASLEEP;
+                semop(sem, &wait, 1);
                 if (barbershop->barber_asleep == 1) {
                     barbershop->curr_client = getpid();
                     sprintf(msg, "Waking the barber up");
                     print_message(msg);
-                    sem_post(sem_wake_up);
-                    sem_wait(sem_sit);
+                    post.sem_num = SEM_WAKE_UP;
+                    semop(sem, &post, 1);
+                    wait.sem_num = SEM_SIT;
+                    semop(sem, &wait, 1);
                     sprintf(msg, "Sitting on a barber's chair");
                     print_message(msg);
-                    sem_post(sem_shave);
-                    sem_wait(sem_end_shaving);
+                    post.sem_num = SEM_SHAVE;
+                    semop(sem, &post, 1);
+                    wait.sem_num = SEM_END_SHAVING;
+                    semop(sem, &wait, 1);
                     sprintf(msg, "Shaved for the %d time", j + 1);
                     print_message(msg);
                     if (j + 1 < no_of_shaves)
@@ -85,29 +80,38 @@ int main(int argc, char **argv) {
                     else
                         sprintf(msg, "Leaving barbershop");
                     print_message(msg);
-                    sem_post(sem_leave);
+                    post.sem_num = SEM_LEAVE;
+                    semop(sem, &post, 1);
                 } else {
-                    sem_wait(sem_waiting_room);
+                    wait.sem_num = SEM_WAITING_ROOM;
+                    semop(sem, &wait, 1);
                     if (barbershop->clients_waiting >= barbershop->waiting_room_capacity) {
                         sprintf(msg, "No free places in waiting room. Leaving barbershop, will be back");
                         print_message(msg);
-                        sem_post(sem_asleep);
-                        sem_post(sem_waiting_room);
+                        post.sem_num = SEM_ASLEEP;
+                        semop(sem, &post, 1);
+                        post.sem_num = SEM_WAITING_ROOM;
+                        semop(sem, &post, 1);
                     } else {
                         sprintf(msg, "Barber is busy. Taking seat in the queue");
                         print_message(msg);
                         barbershop->client_pids[barbershop->clients_waiting] = getpid();
                         barbershop->clients_waiting++;
-                        sem_post(sem_asleep);
-                        sem_post(sem_waiting_room);
+                        post.sem_num = SEM_ASLEEP;
+                        semop(sem, &post, 1);
+                        post.sem_num = SEM_WAITING_ROOM;
+                        semop(sem, &post, 1);
                         while (!first_for_shaving);
                         first_for_shaving = 0;
-                        sem_wait(sem_sit);
+                        wait.sem_num = SEM_SIT;
+                        semop(sem, &wait, 1);
                         sprintf(msg, "Sitting on a barber's chair");
                         print_message(msg);
                         barbershop->curr_client = getpid();
-                        sem_post(sem_shave);
-                        sem_wait(sem_end_shaving);
+                        post.sem_num = SEM_SHAVE;
+                        semop(sem, &post, 1);
+                        wait.sem_num = SEM_END_SHAVING;
+                        semop(sem, &wait, 1);
                         sprintf(msg, "Shaved for the %d time", j + 1);
                         print_message(msg);
                         if (j + 1 < no_of_shaves)
@@ -115,13 +119,14 @@ int main(int argc, char **argv) {
                         else
                             sprintf(msg, "Leaving barbershop");
                         print_message(msg);
-                        sem_post(sem_leave);
+                        post.sem_num = SEM_LEAVE;
+                        semop(sem, &post, 1);
                     }
                 }
             }
             return 0;
         } else {
-            clients[clients_counter] = client_pid;
+            clients[clients_counter] = child;
             clients_counter++;
         }
     }
@@ -139,41 +144,6 @@ void handle_exit(int signum) {
 void handle_invitation(int signum) {
     print_message("First for shaving");
     first_for_shaving = 1;
-}
-
-sem_t *open_semaphore(sem_t *sem, const char *name) {
-    if ((sem = sem_open(name, 0666)) < 0)
-        FAILURE_EXIT(1, "Client: Can't open semaphore %s\n", name);
-    return sem;
-}
-
-void init_semaphores() {
-    sem_waiting_room = open_semaphore(sem_waiting_room, waiting_room);
-    sem_asleep = open_semaphore(sem_asleep, asleep);
-    sem_wake_up = open_semaphore(sem_wake_up, wake_up);
-    sem_sit = open_semaphore(sem_sit, sit);
-    sem_shave = open_semaphore(sem_shave, shave);
-    sem_end_shaving = open_semaphore(sem_end_shaving, end_shaving);
-    sem_leave = open_semaphore(sem_leave, leave);
-}
-
-int semaphore_close(sem_t *sem, const char *name) {
-    int res;
-    if (res = sem_close(sem) < 0) {
-        printf("Client: Can't close semaphore %s\n", name);
-        return res;
-    }
-    return 0;
-}
-
-void remove_semaphores() {
-    semaphore_close(sem_waiting_room, waiting_room);
-    semaphore_close(sem_asleep, asleep);
-    semaphore_close(sem_wake_up, wake_up);
-    semaphore_close(sem_sit, sit);
-    semaphore_close(sem_shave, shave);
-    semaphore_close(sem_end_shaving, end_shaving);
-    semaphore_close(sem_leave, leave);
 }
 
 void print_message(const char *message) {
